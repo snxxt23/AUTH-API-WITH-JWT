@@ -20,3 +20,9 @@ class UserRegistrationSerializers(serializers.ModelSerializer):
         elif re.match(r"^\d{1,3}",username):
             raise serializers.ValidationError('Username should starts with Alphabets')
         return data
+
+class UserLoginSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(max_length=200)
+    class Meta:
+        model = User
+        fields = ['email','password']
