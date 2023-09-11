@@ -37,7 +37,7 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.username
 
-    USERNAME_FIELD = 'email',
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
     def has_perm(self,perm,obj=None):
