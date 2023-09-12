@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from . serializers import UserRegistrationSerializers,UserLoginSerializer,UserProfileSerializer
+from . serializers import UserRegistrationSerializers,UserLoginSerializer,UserProfileSerializer,AllUsersSerializer
 from . models import *
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -53,17 +53,19 @@ class UserProfileView(APIView):
 
 class UserProfileEdit(APIView):
     serializer_classes = [UserProfileSerializer]
+    permission_classes = [IsAuthenticated]
     # permission_classes = [IsAdminUser]
     renderer_classes = [UserRenderer]
     filter_backends = [SearchFilter]
     search_fields = ['^name','=email']
 
     def get(self,request,pk=None):
-        if pk is None:
-            user = User.objects.all()
-            serializer = UserProfileSerializer(user,many=True)
+        if pk is not None:
+            user = User.objects.get(id=pk)
+            serializer = UserProfileSerializer(user)
             return Response(serializer.data,status=status.HTTP_200_OK)
         return Response({"Message":"GET method is not allowed here.!!!"})
+    
     def put(self,request,pk=None):
         if pk is not None:
             user = User.objects.get(pk=pk)
@@ -73,6 +75,7 @@ class UserProfileEdit(APIView):
                 return Response({"Message":"Profile Updated","Profile":serializer.data},status=status.HTTP_200_OK)
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
         return Response({"Message":"Select a user"})
+    
     def delete(self,request,pk=None):
         if pk is not None:
             try:
@@ -86,3 +89,10 @@ class UserProfileEdit(APIView):
     @api_view(['GET','POST','PUT','PATCH','DELETE'])
     def url_check(request,*args,**kwargs):
         return Response({"Error":"Invalid URL pattern"},status=status.HTTP_404_NOT_FOUND)
+
+class AllUsers(APIView):
+    permission_classes = [IsAdminUser]
+    def get(self,request):
+        user = User.objects.all()
+        serializer = AllUsersSerializer(user,many=True)
+        return Response(serializer.data)
