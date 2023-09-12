@@ -53,4 +53,3 @@ class User(AbstractBaseUser):
     def is_staff(self):
         "is this user a member of staff"
         return self.is_admin
-

@@ -26,3 +26,9 @@ class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['email','password']
+        
+class UserProfileSerializer(serializers.ModelSerializer):
+    profile_picture = serializers.FileField(required=False)
+    class Meta:
+        model = User
+        fields = ['id','first_name','last_name','username','email','profile_picture']
