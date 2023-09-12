@@ -5,8 +5,17 @@ from . serializers import UserRegistrationSerializers,UserLoginSerializer
 from . models import *
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from . renderers import UserRenderer
 
+#generate token manually
+def get_token_for_users(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh':str(refresh),
+        'access':str(refresh.access_token),
+    }
 class UserRegistrationView(APIView):
+    renderer_classes = [UserRenderer]
     def post(self,request,format=None):
         serializer = UserRegistrationSerializers(data=request.data)
         if serializer.is_valid():
@@ -17,15 +26,6 @@ class UserRegistrationView(APIView):
             )
             return Response({"Message":"Registration Complete","User":serializer.data},status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-def get_token_for_users(user):
-    refresh = RefreshToken.for_user(user)
-    return {
-        'refresh':str(refresh),
-        'access':str(refresh.access_token),
-        
-    }
-    
 
 class UserLoginView(APIView):
     def post(self,request,format=None):
